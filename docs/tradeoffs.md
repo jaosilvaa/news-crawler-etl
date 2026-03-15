@@ -67,3 +67,34 @@ Como o volume de dados do projeto é pequeno, decidi não utilizar particionamen
 O esquema da tabela no BigQuery foi definido com uma estrutura simples. A coluna `article_url` foi configurada como `STRING` e `REQUIRED`, funcionando como identificador único de cada registro.
 
 Os demais campos (`headline`, `author`, `article_text` e `collected_at`) foram definidos como `NULLABLE`. Essa escolha considera que algumas notícias podem não apresentar autor explícito, como em editoriais ou conteúdos de agência. Dessa forma, o pipeline consegue inserir os dados mesmo quando algumas informações estão ausentes.
+
+## 4.1 API de Consulta
+
+A API foi implementada utilizando o FastAPI. A escolha se deve à simplicidade de configuração e ao bom desempenho para APIs leves. Como o objetivo era apenas permitir consultas sobre os dados já coletados, a estrutura foi mantida mínima.
+
+Foram criadas duas rotas principais: um endpoint de verificação (`/`) para indicar que o serviço está ativo e a rota de busca (`/search`). Outras funcionalidades como paginação ou múltiplos endpoints de consulta não foram implementadas para evitar complexidade desnecessária dentro do escopo do projeto.
+
+---
+
+## 4.2 Estratégia de Busca
+
+A busca é realizada diretamente no BigQuery utilizando uma consulta SQL simples. A palavra-chave fornecida pelo usuário é comparada com os campos de manchete e texto da notícia.
+
+Para permitir busca independente de maiúsculas e minúsculas, a consulta utiliza a função `LOWER()` combinada com a cláusula `LIKE`. O valor recebido pela API é passado como parâmetro da query utilizando o mecanismo de parametrização do BigQuery, evitando a construção dinâmica de SQL com entrada direta do usuário.
+
+---
+
+## 5.1 Organização do Projeto
+
+O projeto foi estruturado separando o crawler e a API em diretórios distintos. O crawler contém o spider, os pipelines de processamento e os itens de dados, enquanto a API concentra apenas o código responsável por expor os dados armazenados.
+
+Essa separação facilita a manutenção do código e deixa mais claro o papel de cada componente dentro do fluxo de coleta e consulta de dados.
+
+---
+
+## 5.2 Configuração e Segurança
+
+As configurações relacionadas ao ambiente de nuvem foram centralizadas em um arquivo `config.yaml`. Nesse arquivo ficam definidos o projeto do GCP, dataset, tabela e o caminho para o arquivo de credenciais.
+
+Essa abordagem evita manter informações de infraestrutura diretamente no código e permite reutilizar a mesma configuração tanto no crawler quanto na API. O arquivo de credenciais da conta de serviço foi incluído no `.gitignore`, impedindo que dados sensíveis sejam versionados no repositório.
+
