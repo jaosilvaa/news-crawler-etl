@@ -35,3 +35,35 @@ Para aumentar a cobertura, a estratégia adotada foi capturar todos os links pre
 Também foram adicionados filtros simples para ignorar páginas que não seguem o formato tradicional de notícia, como URLs que contêm `/live/`, `/audio/`, `/video/` ou `/gallery/`. Esses formatos costumam ter estrutura diferente ou conteúdo atualizado dinamicamente, o que poderia prejudicar a etapa de processamento do texto.
 
 Por fim, foi aplicada uma deduplicação nas URLs coletadas. Isso evita requisições repetidas quando o mesmo artigo aparece em mais de um bloco da página inicial, como em seções de destaque ou recomendações.
+
+## 2.2 Limpeza do Conteúdo
+
+A etapa de limpeza ocorre no pipeline, operando sobre o HTML bruto previamente coletado pelo spider. Utilizei a biblioteca `readability-lxml` para identificar e isolar o bloco principal da notícia. Essa abordagem funciona bem porque o algoritmo descarta automaticamente elementos periféricos, como menus, rodapés e banners de publicidade, evitando a necessidade de manter seletores ou expressões regulares complexas.
+
+Em seguida, o conteúdo isolado passa pelo `BeautifulSoup` apenas para remover as tags HTML remanescentes, resultando na extração direta do texto limpo.
+
+---
+
+## 2.3 Tratamento e Validação
+
+A deduplicação inicial de URLs é feita ainda no spider utilizando a estrutura de dados `set` do Python. Isso evita que o crawler faça requisições repetidas quando o mesmo link aparece em diferentes blocos da página inicial.
+
+No pipeline de limpeza também foram adicionadas regras de descarte (`DropItem`). Caso o HTML esteja vazio ou a extração não produza conteúdo textual válido, o item é descartado para evitar inserir registros incompletos no banco de dados. Também foi aplicada uma padronização simples no campo de autor, removendo espaços em branco extras.
+
+---
+
+## 3.1 Armazenamento dos Dados
+
+Optei pelo Google BigQuery como destino para armazenar os dados estruturados. A integração ocorre em um pipeline dedicado, que abre a conexão ao iniciar o crawler e a encerra ao final do processo.
+
+As configurações de projeto, dataset, tabela e o caminho das credenciais foram isoladas em um arquivo `config.yaml`. Essa separação evita expor variáveis de infraestrutura diretamente no código.
+
+Como o volume de dados do projeto é pequeno, decidi não utilizar particionamento ou clustering na tabela. Isso mantém a estrutura simples e evita complexidade desnecessária para a escala atual.
+
+---
+
+## 3.2 Estrutura dos Dados
+
+O esquema da tabela no BigQuery foi definido com uma estrutura simples. A coluna `article_url` foi configurada como `STRING` e `REQUIRED`, funcionando como identificador único de cada registro.
+
+Os demais campos (`headline`, `author`, `article_text` e `collected_at`) foram definidos como `NULLABLE`. Essa escolha considera que algumas notícias podem não apresentar autor explícito, como em editoriais ou conteúdos de agência. Dessa forma, o pipeline consegue inserir os dados mesmo quando algumas informações estão ausentes.

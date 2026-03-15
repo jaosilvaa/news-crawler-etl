@@ -5,4 +5,4 @@ class NewsItem(scrapy.Item):
     author = scrapy.Field()
     article_text = scrapy.Field()
     article_url = scrapy.Field()
-    collected_at = scrapy.Field()
+    collected_at = scrapy.Field()   

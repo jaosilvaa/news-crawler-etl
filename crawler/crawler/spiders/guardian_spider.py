@@ -47,8 +47,6 @@ class GuardianSpiderSpider(scrapy.Spider):
 
         if headline_lower.startswith('live'):
             return
-        if 'as it happened' in headline_lower:
-            return
         if '– live' in headline_lower or '- live' in headline_lower:
             return
 

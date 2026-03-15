@@ -1,0 +1,5 @@
+gcp:
+  project_id: "news-crawler-etl"
+  dataset_id: "news_data"
+  table_id: "articles"
+  credentials_file: "gcp-credentials.json"
