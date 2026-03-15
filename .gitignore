@@ -3,3 +3,4 @@ __pycache__/
 *.pyc
 *.json
 gcp-credentials.json
+!postman_collection.json

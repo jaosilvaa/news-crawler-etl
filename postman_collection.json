@@ -1,0 +1,62 @@
+{
+  "info": {
+    "name": "News Crawler API",
+    "description": "Coleção de testes para a API de consulta de notícias extraídas do The Guardian e armazenadas no Google BigQuery.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8000/",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            ""
+          ]
+        },
+        "description": "Verifica se o servidor da API está online e respondendo adequadamente."
+      },
+      "response": []
+    },
+    {
+      "name": "2. Buscar Artigos por Palavra-chave",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8000/search?keyword=china",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "search"
+          ],
+          "query": [
+            {
+              "key": "keyword",
+              "value": "china",
+              "description": "Termo utilizado para filtrar as notícias no banco de dados (busca no título e no corpo do texto)."
+            }
+          ]
+        },
+        "description": "Consulta o banco de dados BigQuery retornando os artigos que correspondem à palavra-chave fornecida."
+      },
+      "response": []
+    }
+  ]
+}
