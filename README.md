@@ -4,25 +4,38 @@ Este projeto implementa um pipeline de dados para coleta, processamento e armaze
 
 O objetivo é automatizar a extração de artigos utilizando um crawler desenvolvido com Scrapy, realizar a limpeza do conteúdo textual das páginas e armazenar os dados estruturados no Google BigQuery. Como etapa adicional, o projeto disponibiliza uma API simples em FastAPI para consulta de artigos por palavra-chave.
 
+## Arquitetura do Pipeline
+
+O projeto segue um fluxo simples de dados. Primeiro o crawler coleta as notícias no site do The Guardian e salva o HTML bruto de cada página. Em seguida o pipeline processa esse conteúdo para extrair apenas o texto principal do artigo.
+
+Depois da limpeza, os dados estruturados são enviados para o Google BigQuery. A API em FastAPI consulta essa tabela e permite buscar notícias por palavra-chave.
+
+![Arquitetura do pipeline](docs/images/pipeline_diagram.png)
+
 ## Estrutura do Projeto
 
-* **`crawler/`** Scripts responsáveis pelo web scraping no site The Guardian e processamento do HTML.
-    * `spiders/guardian_spider.py`: Spider responsável por navegar no site, coletar URLs válidas e extrair o HTML bruto das notícias.
-    * `pipelines.py`: Scripts de ETL (Extração, Transformação e Carga). Realizam a limpeza do texto (removendo menus/anúncios com Readability e BeautifulSoup) e a carga direta dos dados no BigQuery.
-    * `items.py`: Definição da estrutura de dados extraída.
-    * `settings.py`: Configurações de execução do Scrapy (pipelines, delays, user-agent).
-* **`api/`** API REST desenvolvida com FastAPI para expor os dados armazenados na nuvem.
-    * `main.py`: Definição das rotas de Health Check e Busca (`/search`), além da conexão parametrizada com o BigQuery.
-* **`config.yaml`** Arquivo central de configurações com os dados do projeto, dataset e tabela do GCP.
-* **`postman_collection.json`** Collection pronta com exemplos de requisições para facilitar o teste das rotas.
-* **`tradeoffs.md`** Documentação das decisões técnicas e trade-offs adotados no projeto.
-
+```text
+news-crawler-etl/
+├── api/
+│   └── main.py                 # Rotas da API em FastAPI e consulta ao BigQuery
+├── crawler/
+│   ├── spiders/
+│   │   └── guardian_spider.py  # Coleta de URLs e extração do HTML das notícias
+│   ├── items.py                # Estrutura dos dados coletados
+│   ├── pipelines.py            # Limpeza do conteúdo com Readability e BeautifulSoup, e envio para o BigQuery
+│   └── settings.py             # Configurações do crawler no Scrapy
+├── docs/
+│   └── tradeoffs.md            # Decisões técnicas e arquitetura do projeto
+├── config.yaml                 # Configurações do projeto no Google Cloud
+├── postman_collection.json     # Requisições prontas para testar a API
+└── requirements.txt            # Dependências do projeto
+```
 ## Pré-requisitos
 
 * Python 3.10 ou superior
-* Gerenciador de pacotes `pip`
+* Gerenciador de pacotes pip
 * Conta no Google Cloud Platform (GCP) com a API do BigQuery ativada
-* Chave de serviço (Service Account) do GCP em formato JSON (`gcp-credentials.json`)
+* Chave de serviço do Google Cloud em formato JSON, nomeada `gcp-credentials.json`
 
 ## Decisões Técnicas e Trade-offs
 
@@ -43,8 +56,8 @@ Prepare o ambiente Python e as credenciais da nuvem.
     pip install -r requirements.txt
     ```
 2.  Configure o acesso ao banco:
-    * Insira o seu arquivo de chave do Google Cloud na raiz do projeto e renomeie para `gcp-credentials.json`.
-    * Abra o arquivo `config.yaml` e ajuste as variáveis `project_id`, `dataset_id` e `table_id` conforme a sua estrutura no BigQuery.
+    * Insira o seu arquivo de chave do Google Cloud na raiz do projeto e renomeie para gcp-credentials.json.
+    * Abra o arquivo config.yaml e ajuste as variáveis `project_id`, `dataset_id` e `table_id` conforme a sua estrutura no BigQuery.
 
 ### 2. Pipeline de Dados ETL (Crawler)
 
@@ -80,6 +93,20 @@ Para validar os endpoints isoladamente de forma rápida:
 1.  Abra o **Postman**.
 2.  Importe o arquivo `postman_collection.json` localizado na raiz do projeto.
 3.  Utilize as requisições prontas na pasta "News Crawler API" para testar o status do servidor e a busca por palavra-chave.
+
+## Prévia da Aplicação
+
+### Swagger UI
+Documentação interativa gerada automaticamente pelo FastAPI, detalhando as rotas de Health Check e Busca parametrizada.
+
+![Swagger UI](docs/images/swagger.png)
+
+### Consulta via Postman
+Exemplo de requisição bem-sucedida consultando a base do BigQuery por palavra-chave e retornando o JSON estruturado da notícia.
+
+![Consulta via Postman](docs/images/postman.png)
+
+*(Screenshots demonstrativos da API REST desenvolvida e em funcionamento)*
 
 ## Autor
 
