@@ -28,7 +28,7 @@ O objetivo é automatizar a extração de artigos utilizando um crawler desenvol
 
 Todas as decisões de arquitetura, escolhas de bibliotecas (como o uso de Scrapy, Readability-lxml e FastAPI), estratégias de nuvem (BigQuery) e justificativas para o tratamento de dados inconsistentes estão detalhadas no documento específico:
 
-[Ler Documentação de Trade-offs](tradeoffs.md)
+[Ler Documentação de Trade-offs](docs/tradeoffs.md)
 
 ## Como usar este projeto
 
