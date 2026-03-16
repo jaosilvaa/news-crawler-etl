@@ -3,7 +3,7 @@ from datetime import datetime
 from crawler.items import NewsItem
 
 
-class GuardianSpiderSpider(scrapy.Spider):
+class GuardianSpider(scrapy.Spider):
     """
     Spider responsável por coletar notícias da seção World do site The Guardian.
     O foco são artigos padrão de notícia. Conteúdos como live blogs, vídeos,
